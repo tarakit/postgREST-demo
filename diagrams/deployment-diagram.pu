@@ -1,0 +1,54 @@
+@startuml
+
+skinparam rectangle {
+    BorderStyle dashed
+    BackgroundColor #FFACAC
+}
+
+skinparam node {
+    BackgroundColor #FFFF91
+}
+
+skinparam folder {
+    BackgroundColor #D6ACFF
+}
+
+node "Web Browser" as client #ACACFF
+
+node "Docker Host" as docker_host #91FFEC {
+    rectangle "docker-compose.yml" as docker_compose_yml {
+        database "PostgreSQL" as postgres #FFFF91
+        node "PostgREST" as postgrest
+        node "NGINX" as nginx
+    }
+
+    rectangle "docker-compose.override.yml" as docker_compose_override_yml {
+        node "Swagger UI" as swagger_ui
+    }
+}
+
+folder html [
+    <b>./html</b>
+    ---
+    Static HTML, JS, etc
+]
+
+folder initdb [
+    <b>./initdb</b>
+    ---
+    SQL and shell scripts
+    run at database startup
+]
+
+client -right- nginx
+client -- postgrest
+client -- swagger_ui
+
+postgrest -- postgres
+
+postgrest -left- swagger_ui
+
+nginx -right- html
+postgres -right- initdb
+
+@enduml
